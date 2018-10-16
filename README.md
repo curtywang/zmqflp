@@ -1,2 +1,2 @@
 # zmqflp
-Python-based ZeroMQ server/client implementing the Freelance protocol
+Improvements to the Freelance protocol-based zeromq server/client (Python)
