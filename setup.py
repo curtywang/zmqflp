@@ -8,6 +8,7 @@ setuptools.setup(
     description="PyZMQ server/client implementing asyncio freelance protocol based on Min RK's starter code",
     packages=setuptools.find_packages(),
     install_requires=['pyzmq', 'u-msgpack-python'],
+    url="https://github.com/curtywang/zmqflp",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
