@@ -11,6 +11,8 @@ Also allows for a context-manager-based client
 import threading
 import time
 import logging
+import os
+import binascii
 import zmq
 
 # If no server replies within this time, abandon request
@@ -36,7 +38,7 @@ class FreelanceClient(object):
 
     def __init__(self):
         self.ctx = zmq.Context()
-        self.pipe, self.peer = zpipe(self.ctx)
+        self.pipe, self.peer = self.zpipe(self.ctx)
         self.threadevent = threading.Event()
         self.threadevent.set()
         self.agent = threading.Thread(target=agent_task, args=(self.ctx, self.peer, self.threadevent))
