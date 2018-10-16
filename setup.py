@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="zmqflp",
-    version="0.0.2",
+    version="0.0.3",
     author="Curtis Wang",
     author_email="ycwang@u.northwestern.edu",
     description="PyZMQ server/client implementing asyncio freelance protocol based on Min RK's starter code",
