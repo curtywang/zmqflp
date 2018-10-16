@@ -12,7 +12,6 @@ import threading
 import time
 import logging
 import zmq
-from .zmqflp_helpers import zpipe
 
 # If no server replies within this time, abandon request
 GLOBAL_TIMEOUT = 2000    # msecs
@@ -43,6 +42,20 @@ class FreelanceClient(object):
         self.agent = threading.Thread(target=agent_task, args=(self.ctx, self.peer, self.threadevent))
         self.agent.daemon = True
         self.agent.start()
+
+    def zpipe(self, ctx):
+        """build inproc pipe for talking to threads
+        mimic pipe used in czmq zthread_fork.
+        Returns a pair of PAIRs connected via inproc
+        """
+        a = ctx.socket(zmq.PAIR)
+        b = ctx.socket(zmq.PAIR)
+        a.linger = b.linger = 0
+        a.hwm = b.hwm = 1
+        iface = "inproc://%s" % binascii.hexlify(os.urandom(8))
+        a.bind(iface)
+        b.connect(iface)
+        return a,b
 
     def connect(self, endpoint):
         """Connect to new server endpoint

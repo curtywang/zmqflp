@@ -6,8 +6,6 @@ import socket
 import umsgpack
 import logging
 
-from .zmqflp_helpers import dump
-
 class ZMQFLPServer(object):
     def __init__(self, custom_identity = None, str_port = '9001'):
         ctx = zmq.asyncio.Context()
