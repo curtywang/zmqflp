@@ -24,7 +24,7 @@ class ZMQFLPManagedClient(object):
             logging.info("error, request "+str(in_request)+" unserviced")
             return False
         else:
-            return umsgpack.loads(reply[2])#.decode('utf8')
+            return umsgpack.loads(reply[2], encoding="utf-8")
     
     def __exit__(self, *args):
         print('stopping client...')
