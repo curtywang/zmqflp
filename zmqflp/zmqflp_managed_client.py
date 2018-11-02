@@ -27,5 +27,8 @@ class ZMQFLPManagedClient(object):
             return umsgpack.loads(reply[2], encoding="utf-8")
     
     def __exit__(self, *args):
-        print('stopping client...')
-        self.client.stop()
+        try:
+            print('stopping client...')
+            self.client.stop()
+        except Exception as e:
+            return
