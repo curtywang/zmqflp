@@ -198,7 +198,7 @@ def agent_task(ctx, pipe, threadevent):
                 tickless = server.tickless(tickless)
         try:
             items = dict(poller.poll(1000 * (tickless - time.time())))
-        except zmq.ContextTerminated:
+        except (zmq.ContextTerminated, zmq.error.ZMQError) as e:
             return False              # Context has been shut down
 
         if agent.pipe in items:
