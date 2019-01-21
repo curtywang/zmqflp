@@ -9,7 +9,7 @@ from .zmqflp_api import FreelanceClient
 class ZMQFLPManagedClient(object):
     def __init__(self, list_of_server_ips_with_ports_as_str):
         self.client = FreelanceClient()
-        time.sleep(0.2) # wait for client to come up
+        time.sleep(0.3) # wait for client to come up
         for ip in list_of_server_ips_with_ports_as_str:
             logging.info('client: connecting to server '+ip)
             self.client.connect("tcp://"+ip)

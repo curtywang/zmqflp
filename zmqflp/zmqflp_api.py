@@ -56,7 +56,7 @@ class FreelanceClient(object):
         a.hwm = b.hwm = 1
         #iface = "inproc://%s" % binascii.hexlify(os.urandom(8))
         iface = 'tcp://127.0.0.1'
-        port = a.bind_to_random_port(iface, min_port=1024, max_port=65536, max_tries=30)
+        port = a.bind_to_random_port(iface, min_port=10000, max_port=65536, max_tries=10)
         b.connect(iface+':'+str(port))
         return a,b
 
