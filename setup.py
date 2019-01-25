@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="zmqflp",
-    version="0.1.3",
+    version="0.1.4",
     author="Curtis Wang",
     author_email="ycwang@u.northwestern.edu",
     description="PyZMQ server/client implementing asyncio freelance protocol based on Min RK's starter code",

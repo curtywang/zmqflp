@@ -83,6 +83,9 @@ class FreelanceClient(object):
         self.threadevent.clear()
         self.agent.join(timeout=0.5)
         print("terminating agent context...")
+        self.pipe.close()
+        self.peer.close()
+        self.ctx.term()
         self.ctx.destroy()
 
 

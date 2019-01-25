@@ -29,6 +29,8 @@ class ZMQFLPServer(object):
         try:
             request = await self.server.recv_multipart()
             control = request[1].decode('utf8')
+        except asyncio.CancelledError:
+            return # Interrupted
         except Exception as e:
             logging.exception(e)
             return # Interrupted
