@@ -22,6 +22,9 @@ class ZMQFLPServer(object):
         logging.info("I: service is ready with identity " + str(connect_endpoint))
         logging.info("I: service is bound to " + str(bind_endpoint))
 
+        self.message_table = {}
+
+
     async def receive(self):
         # Frame 0: identity of client
         # Frame 1: PING, or client control frame
@@ -30,15 +33,23 @@ class ZMQFLPServer(object):
             request = await self.server.recv_multipart()
             control = request[1].decode('utf8')
         except asyncio.CancelledError:
-            return # Interrupted
+            return (None, None) # Interrupted
         except Exception as e:
             logging.exception(e)
-            return # Interrupted
+            return (None, None) # Interrupted
         if control == "PING":
             await self.send([request[0]], "PONG".encode('utf8'), mpack=False)
             return (request[1].decode('utf8'), [request[0]])
         else:
-            return (umsgpack.loads(request[2], raw=False), request[0:2])
+            if request[0] not in self.message_table:
+                self.message_table[request[0]] = request[1]
+                return (umsgpack.loads(request[2], raw=False), request[0:2])
+            elif self.message_table[request[0]] == request[1]:
+                return (None, None)
+            else:
+                self.message_table[request[0]] = request[1]
+                return (umsgpack.loads(request[2], raw=False), request[0:2])
+
 
     async def send(self, orig_req_headers, str_resp, mpack=True):
         out_message = orig_req_headers

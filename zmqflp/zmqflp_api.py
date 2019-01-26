@@ -16,7 +16,7 @@ import binascii
 import zmq
 
 # If no server replies within this time, abandon request
-GLOBAL_TIMEOUT = 6000    # msecs
+GLOBAL_TIMEOUT = 4000    # msecs
 # PING interval for servers we think are alivecp
 PING_INTERVAL  = 1000    # msecs
 # Server considered dead if silent for this long
@@ -196,7 +196,7 @@ def agent_task(ctx, pipe, threadevent):
 
     while threadevent.is_set():
         # Calculate tickless timer, up to 1 hour
-        tickless = time.time() + 3600
+        tickless = time.time() + 120
         if (agent.request and tickless > agent.expires):
             tickless = agent.expires
             for server in agent.servers.values():
@@ -227,7 +227,8 @@ def agent_task(ctx, pipe, threadevent):
                     else:
                         request = [server.endpoint] + agent.request
                         agent.router.send_multipart(request)
-                        agent.actives.append(server) # maintian LRU queue
+                        if server not in agent.actives:
+                            agent.actives.append(server) # maintian LRU queue
                         break
 
         # Disconnect and delete any expired servers
