@@ -4,8 +4,8 @@ import logging
 from .zmqflp_api import FreelanceClient
 
 class ZMQFLPClient(object):
-    def __init__(self, list_of_server_ips_with_ports_as_str):
-        self.client = FreelanceClient()
+    def __init__(self, list_of_server_ips_with_ports_as_str, total_timeout=4000):
+        self.client = FreelanceClient(optional_global_timeout=total_timeout)
         time.sleep(0.1)
         for ip in list_of_server_ips_with_ports_as_str:
             logging.info('client: connecting to server '+ip)

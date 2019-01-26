@@ -20,7 +20,7 @@ GLOBAL_TIMEOUT = 4000    # msecs
 # PING interval for servers we think are alivecp
 PING_INTERVAL  = 1000    # msecs
 # Server considered dead if silent for this long
-SERVER_TTL     = 6000    # msecs
+SERVER_TTL     = 12000    # msecs
 
 
 def flciapi_agent(peer):
@@ -36,12 +36,13 @@ class FreelanceClient(object):
     pipe = None     # Pipe through to flciapi agent
     agent = None    # agent in a thread
 
-    def __init__(self):
+    def __init__(self, optional_global_timeout=4000):
         self.ctx = zmq.Context()
+        self.global_timeout = optional_global_timeout
         self.pipe, self.peer = self.zpipe(self.ctx)
         self.threadevent = threading.Event()
         self.threadevent.set()
-        self.agent = threading.Thread(target=agent_task, args=(self.ctx, self.peer, self.threadevent))
+        self.agent = threading.Thread(target=agent_task, args=(self.ctx, self.peer, self.threadevent, self.global_timeout))
         self.agent.daemon = True
         self.agent.start()
 
@@ -131,12 +132,13 @@ class FreelanceAgent(object):
     reply = None            # Current reply if any
     expires = 0             # Timeout for request/reply
 
-    def __init__(self, ctx, pipe):
+    def __init__(self, ctx, pipe, global_timeout):
         self.ctx = ctx
         self.pipe = pipe
         self.router = ctx.socket(zmq.ROUTER)
         self.servers = {}
         self.actives = []
+        self.global_timeout = global_timeout
 
     def control_message (self):
         msg = self.pipe.recv_multipart()
@@ -157,7 +159,7 @@ class FreelanceAgent(object):
             # Prefix request with sequence number and empty envelope
             self.request = [str(self.sequence).encode('utf8')] + msg
             # Request expires after global timeout
-            self.expires = time.time() + 1e-3*GLOBAL_TIMEOUT
+            self.expires = time.time() + 1e-3*self.global_timeout
 
     def router_message (self):
         reply = self.router.recv_multipart()
