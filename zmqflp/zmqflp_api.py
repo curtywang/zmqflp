@@ -43,10 +43,10 @@ class FreelanceClient(object):
         self.pipe, self.peer = self.zpipe(self.ctx)
         self.threadevent = threading.Event()
         self.threadevent.set()
-        self.agent = threading.Thread(target=agent_task, args=(self.ctx, self.peer, self.threadevent, self.global_timeout))
-        self.agent.daemon = True
-        self.agent.start()
-        #self.agent = asyncio.run(agent_task(self.ctx, self.peer, self.threadevent, self.global_timeout))
+        #self.agent = threading.Thread(target=agent_task, args=(self.ctx, self.peer, self.threadevent, self.global_timeout))
+        #self.agent.daemon = True
+        #self.agent.start()
+        self.agent = await asyncio.run(agent_task(self.ctx, self.peer, self.threadevent, self.global_timeout))
 
     def zpipe(self, ctx):
         """build inproc pipe for talking to threads
@@ -190,7 +190,7 @@ class FreelanceAgent(object):
 # Asynchronous agent manages server pool and handles request/reply
 # dialog when the application asks for it.
 
-def agent_task(ctx, pipe, threadevent, global_timeout):
+async def agent_task(ctx, pipe, threadevent, global_timeout):
     agent = FreelanceAgent(ctx, pipe, global_timeout)
     logging.info('registering client agent...')
     poller = zmq.Poller()
