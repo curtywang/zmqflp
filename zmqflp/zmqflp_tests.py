@@ -38,7 +38,7 @@ def run_test(client, num_of_tests):
         test_message = ["TEST" for i in range(LEN_TEST_MESSAGE)]
         reply = client.send_and_receive(msgpack.dumps(test_message))
         #logging.debug('reply: '+str(reply))
-        if len(reply) != LEN_TEST_MESSAGE:#"TEST_OK":
+        if (len(reply) != LEN_TEST_MESSAGE) and (reply[-1] != "TEST"):#"TEST_OK":
             logging.debug("TEST_FAILURE")
             raise ValueError()
     logging.debug("ending client send")
