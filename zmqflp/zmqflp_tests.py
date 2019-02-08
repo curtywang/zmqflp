@@ -35,7 +35,7 @@ async def server_loop():
         return
 
 
-async def run_test(client, num_of_tests):
+async def run_test(num_of_tests):
     logging.debug("starting client send")
     client = zmqflp_client.ZMQFLPClient([socket.gethostbyname(socket.gethostname())+':9001'])
     for i in range(num_of_tests):
@@ -68,7 +68,7 @@ def main():
 
     logging.debug(">> starting zmq freelance protocol test!")
     start = time.time()
-    asyncio.run(run_test(client, requests))
+    asyncio.run(run_test(requests))
     #client_process.start()
     #client_process.join()
     avg_time = ((time.time() - start) / requests)
