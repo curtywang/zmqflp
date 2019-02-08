@@ -190,11 +190,11 @@ class FreelanceAgent(object):
 
 async def agent_task(ctx, pipe, threadevent, global_timeout):
     agent = FreelanceAgent(ctx, pipe, global_timeout)
-    logging.info('registering client agent...')
+    logging.debug('registering client agent...')
     poller = zmq.asyncio.Poller()
     poller.register(agent.pipe, zmq.POLLIN)
     poller.register(agent.router, zmq.POLLIN)
-    logging.info('done registering client agent!')
+    logging.debug('done registering client agent!')
 
     while threadevent.is_set():
         # Calculate tickless timer, up to 1 hour

@@ -57,8 +57,8 @@ def main():
         level=logging.DEBUG)
     requests = 1
     logging.debug(">> creating server process...")
-    new_ctx = multiprocessing.get_context('spawn')
-    server_process = new_ctx.Process(target=server_main, daemon=True)
+    #new_ctx = multiprocessing.get_context('spawn')
+    server_process = multiprocessing.Process(target=server_main, daemon=True)
     server_process.start()
     logging.debug(">> server process created!")
     time.sleep(0.5)
