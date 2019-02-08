@@ -18,7 +18,7 @@ class ZMQFLPManagedClient(object):
         return self
 
     def send_and_receive(self, in_request):
-        reply = self.client.request(msgpack.dumps(in_request))
+        reply = self.client.request(msgpack.dumps(in_request, use_bin_type=True))
         if not reply:
             logging.info("error, request "+str(in_request)+" unserviced")
             return False

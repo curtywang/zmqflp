@@ -54,7 +54,7 @@ class ZMQFLPServer(object):
     async def send(self, orig_req_headers, str_resp, mpack=True):
         out_message = orig_req_headers
         if mpack:
-            out_message.append(msgpack.dumps(str_resp))#.encode('utf8'))
+            out_message.append(msgpack.dumps(str_resp, use_bin_type=True))#.encode('utf8'))
         else:
             out_message.append(str_resp)
         await self.server.send_multipart(out_message)
