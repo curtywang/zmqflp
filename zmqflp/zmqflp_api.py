@@ -59,7 +59,7 @@ class FreelanceClient(object):
         iface = 'tcp://127.0.0.1'
         port = a.bind_to_random_port(iface, min_port=10000, max_port=65536, max_tries=10)
         b.connect(iface+':'+str(port))
-        time.sleep(0.5)
+        time.sleep(0.1)
         return a,b
 
     def connect(self, endpoint):
