@@ -190,7 +190,7 @@ class FreelanceAgent(object):
 # Asynchronous agent manages server pool and handles request/reply
 # dialog when the application asks for it.
 
-def agent_task(ctx, pipe, threadevent, global_timeout):
+async def agent_task(ctx, pipe, threadevent, global_timeout):
     agent = FreelanceAgent(ctx, pipe, global_timeout)
     logging.info('registering client agent...')
     poller = zmq.Poller()
