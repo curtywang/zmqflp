@@ -43,12 +43,12 @@ class ZMQFLPServer(object):
         else:
             if request[0] not in self.message_table:
                 self.message_table[request[0]] = request[1]
-                return (msgpack.loads(request[2], raw=False), request[0:2]) # , encoding="utf-8"
+                return (msgpack.loads(request[2], raw=False, encoding="utf-8"), request[0:2])
             elif self.message_table[request[0]] == request[1]:
                 return (None, None)
             else:
                 self.message_table[request[0]] = request[1]
-                return (msgpack.loads(request[2], raw=False), request[0:2]) # , encoding="utf-8"
+                return (msgpack.loads(request[2], raw=False, encoding="utf-8"), request[0:2])
 
 
     async def send(self, orig_req_headers, str_resp, mpack=True):
