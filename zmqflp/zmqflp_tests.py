@@ -12,9 +12,7 @@ LEN_TEST_MESSAGE = 1000
 
 
 def server_main():
-    asyncio.get_event_loop().run_until_complete(asyncio.wait([
-        server_loop()
-    ]))
+    asyncio.run(server_loop())
     return 0
 
 async def server_loop():
@@ -73,7 +71,7 @@ def main():
     #client_process.join()
     avg_time = ((time.time() - start) / requests)
     logging.debug(">> waiting for server to exit...")
-    server_process.join()
+    server_process.join(timeout=2)
     logging.debug("Average RT time (sec): "+str(avg_time))
     return
 
