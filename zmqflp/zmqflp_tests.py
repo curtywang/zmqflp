@@ -37,6 +37,7 @@ async def server_loop():
 
 async def run_test(client, num_of_tests):
     logging.debug("starting client send")
+    client = zmqflp_client.ZMQFLPClient([socket.gethostbyname(socket.gethostname())+':9001'])
     for i in range(num_of_tests):
         test_message = ["TEST" for i in range(LEN_TEST_MESSAGE)]
         reply = await client.send_and_receive(msgpack.dumps(test_message))
@@ -64,7 +65,6 @@ def main():
     logging.debug(">> server process created!")
     time.sleep(0.5)
     #client_process = Process(target=client_main, args=(requests,))
-    client = zmqflp_client.ZMQFLPClient([socket.gethostbyname(socket.gethostname())+':9001'])
 
     logging.debug(">> starting zmq freelance protocol test!")
     start = time.time()
