@@ -5,12 +5,12 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="zmqflp",
-    version="0.2.3",
+    version="0.3.0",
     author="Curtis Wang",
     author_email="ycwang@u.northwestern.edu",
     description="PyZMQ server/client implementing asyncio freelance protocol based on Min RK's starter code",
     packages=setuptools.find_packages(),
-    install_requires=['pyzmq', 'msgpack'],
+    install_requires=['pyzmq', 'cbor2'],
     url="https://github.com/curtywang/zmqflp",
     long_description=long_description,
     long_description_content_type="text/markdown",
