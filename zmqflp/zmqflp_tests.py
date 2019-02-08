@@ -5,7 +5,7 @@ from multiprocessing import Process
 import socket
 import asyncio
 import logging
-import umsgpack
+import msgpack
 
 
 LEN_TEST_MESSAGE = 1000
@@ -24,7 +24,7 @@ async def server_loop():
     while keep_running:
         # handle the "TEST" requests
         (str_request, orig_headers) = await server.receive()
-        req_object = umsgpack.loads(str_request)
+        req_object = msgpack.loads(str_request)
         if req_object != "EXIT":
             await server.send(orig_headers, req_object)
         elif req_object == "EXIT":
@@ -38,13 +38,13 @@ async def server_loop():
 def run_test(client, num_of_tests):
     for i in range(num_of_tests):
         test_message = ["TEST" for i in range(LEN_TEST_MESSAGE)]
-        reply = client.send_and_receive(umsgpack.dumps(test_message))
+        reply = client.send_and_receive(msgpack.dumps(test_message))
         #logging.debug('reply: '+str(reply))
         if len(reply) != LEN_TEST_MESSAGE:#"TEST_OK":
             logging.debug("TEST_FAILURE")
             raise ValueError()
     logging.debug("ending client send")
-    client.send_and_receive(umsgpack.dumps("EXIT"))
+    client.send_and_receive(msgpack.dumps("EXIT"))
     return
 
 

@@ -1,5 +1,5 @@
 import time
-import umsgpack
+import msgpack
 import logging
 from .zmqflp_api import FreelanceClient
 
@@ -13,9 +13,9 @@ class ZMQFLPClient(object):
             logging.info('client: added server '+ip)
 
     def send_and_receive(self, in_request):
-        reply = self.client.request(umsgpack.dumps(in_request))
+        reply = self.client.request(msgpack.dumps(in_request))
         if not reply:
             logging.info("error, request "+str(in_request)+" unserviced")
             return False
         else:
-            return umsgpack.loads(reply[2], encoding="utf-8")
+            return msgpack.loads(reply[2], encoding="utf-8")
