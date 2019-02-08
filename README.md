@@ -1,7 +1,7 @@
 # zmqflp
 
 Improvements to the Freelance protocol-based zeromq server/client (Python)
-The client and server talk using umsgpack, so the api accepts dictionaries as input.
+The client and server talk using msgpack, so the api accepts dictionaries as input.
 
 ## To create a zmqflp server:
 

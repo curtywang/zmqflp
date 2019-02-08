@@ -1,11 +1,11 @@
 import zmqflp_client
 import zmqflp_server
 import time
-from multiprocessing import Process
+import multiprocessing
 import socket
 import asyncio
 import logging
-import umsgpack
+import msgpack
 
 
 LEN_TEST_MESSAGE = 1000
@@ -24,7 +24,7 @@ async def server_loop():
     while keep_running:
         # handle the "TEST" requests
         (str_request, orig_headers) = await server.receive()
-        req_object = umsgpack.loads(str_request)
+        req_object = msgpack.loads(str_request)
         if req_object != "EXIT":
             await server.send(orig_headers, req_object)
         elif req_object == "EXIT":
@@ -35,16 +35,16 @@ async def server_loop():
         return
 
 
-def run_test(client, num_of_tests):
+async def run_test(client, num_of_tests):
     for i in range(num_of_tests):
         test_message = ["TEST" for i in range(LEN_TEST_MESSAGE)]
-        reply = client.send_and_receive(umsgpack.dumps(test_message))
+        reply = await client.send_and_receive(msgpack.dumps(test_message))
         #logging.debug('reply: '+str(reply))
         if len(reply) != LEN_TEST_MESSAGE:#"TEST_OK":
             logging.debug("TEST_FAILURE")
             raise ValueError()
     logging.debug("ending client send")
-    client.send_and_receive(umsgpack.dumps("EXIT"))
+    client.send_and_receive(msgpack.dumps("EXIT"))
     return
 
 
@@ -55,16 +55,19 @@ def main():
         datefmt='%Y-%m-%d %H:%M:%S', 
         handlers=log_handlers, 
         level=logging.DEBUG)
-    requests = 1000
-    server_process = Process(target=server_main)
+    requests = 1
+    logging.debug(">> creating server process...")
+    new_ctx = multiprocessing.get_context('spawn')
+    server_process = new_ctx.Process(target=server_main, daemon=True)
     server_process.start()
+    logging.debug(">> server process created!")
     time.sleep(0.5)
     #client_process = Process(target=client_main, args=(requests,))
     client = zmqflp_client.ZMQFLPClient([socket.gethostbyname(socket.gethostname())+':9001'])
 
     logging.debug(">> starting zmq freelance protocol test!")
     start = time.time()
-    run_test(client, requests)
+    asyncio.run(run_test(client, requests))
     #client_process.start()
     #client_process.join()
     avg_time = ((time.time() - start) / requests)

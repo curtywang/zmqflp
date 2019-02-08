@@ -12,6 +12,7 @@ import threading
 import time
 import logging
 import os
+import asyncio
 import binascii
 import zmq
 
@@ -37,14 +38,15 @@ class FreelanceClient(object):
     agent = None    # agent in a thread
 
     def __init__(self, optional_global_timeout=4000):
-        self.ctx = zmq.Context()
+        self.ctx = zmq.asyncio.Context()
         self.global_timeout = optional_global_timeout
         self.pipe, self.peer = self.zpipe(self.ctx)
         self.threadevent = threading.Event()
         self.threadevent.set()
-        self.agent = threading.Thread(target=agent_task, args=(self.ctx, self.peer, self.threadevent, self.global_timeout))
-        self.agent.daemon = True
-        self.agent.start()
+        #self.agent = threading.Thread(target=agent_task, args=(self.ctx, self.peer, self.threadevent, self.global_timeout))
+        #self.agent.daemon = True
+        #self.agent.start()
+        self.agent = asyncio.run(agent_task(self.ctx, self.peer, self.threadevent, self.global_timeout))
 
     def zpipe(self, ctx):
         """build inproc pipe for talking to threads
@@ -69,10 +71,10 @@ class FreelanceClient(object):
         self.pipe.send_multipart(["CONNECT".encode('utf8'), endpoint.encode('utf8')])
         time.sleep(0.1) # Allow connection to come up
 
-    def request(self, msg):
+    async def request(self, msg):
         request = ["REQUEST".encode('utf8'), msg]#.encode('utf8')]
-        self.pipe.send_multipart(request)
-        reply = self.pipe.recv_multipart()
+        await self.pipe.send_multipart(request)
+        reply = await self.pipe.recv_multipart()
         status = reply.pop(0).decode('utf8')
         if status != "FAILED":
             return reply
@@ -188,8 +190,8 @@ class FreelanceAgent(object):
 # Asynchronous agent manages server pool and handles request/reply
 # dialog when the application asks for it.
 
-def agent_task(ctx, pipe, threadevent):
-    agent = FreelanceAgent(ctx, pipe)
+def agent_task(ctx, pipe, threadevent, global_timeout):
+    agent = FreelanceAgent(ctx, pipe, global_timeout)
     logging.info('registering client agent...')
     poller = zmq.Poller()
     poller.register(agent.pipe, zmq.POLLIN)
