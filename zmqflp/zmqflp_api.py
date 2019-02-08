@@ -68,6 +68,7 @@ class FreelanceClient(object):
 
     async def request(self, msg):
         request = ["REQUEST".encode('utf8'), msg]#.encode('utf8')]
+        logging.debug('>> sending request to agent: '+str(request))
         await self.pipe.send_multipart(request)
         reply = await self.pipe.recv_multipart()
         status = reply.pop(0).decode('utf8')
