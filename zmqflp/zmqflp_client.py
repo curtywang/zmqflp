@@ -18,4 +18,4 @@ class ZMQFLPClient(object):
             logging.info("error, request "+str(in_request)+" unserviced")
             return False
         else:
-            return msgpack.loads(reply[2], raw=False, encoding="utf-8")
+            return msgpack.loads(reply[2], raw=False)#, encoding="utf-8")
