@@ -8,7 +8,7 @@ import logging
 import msgpack
 
 
-LEN_TEST_MESSAGE = 1000
+LEN_TEST_MESSAGE = 10000
 
 
 def server_main():
