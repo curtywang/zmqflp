@@ -62,7 +62,7 @@ class FreelanceClient(object):
         """Connect to new server endpoint
         Sends [CONNECT][endpoint] to the agent
         """
-        self.agent = asyncio.run_coroutine_threadsafe(agent_task(self.ctx, self.peer, self.threadevent, self.global_timeout), asyncio.get_event_loop())
+        self.agent = asyncio.run_coroutine_threadsafe(agent_task(self.ctx, self.peer, self.threadevent, self.global_timeout), asyncio.get_running_loop())
         time.sleep(0.1) # Allow connection to come up
         self.pipe.send_multipart(["CONNECT".encode('utf8'), endpoint.encode('utf8')])
         time.sleep(0.1) # Allow connection to come up
