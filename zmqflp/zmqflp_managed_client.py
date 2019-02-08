@@ -1,14 +1,14 @@
 import time
 import msgpack
 import logging
-from .zmqflp_api import FreelanceClient
+import zmqflp_api
 
 # Client usable with Context Managers
 # needed for containerized python jobs
 
 class ZMQFLPManagedClient(object):
     def __init__(self, list_of_server_ips_with_ports_as_str):
-        self.client = FreelanceClient()
+        self.client = zmqflp_api.FreelanceClient()
         for ip in list_of_server_ips_with_ports_as_str:
             logging.info('client: connecting to server '+ip)
             self.client.connect("tcp://"+ip)
