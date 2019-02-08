@@ -153,7 +153,7 @@ class FreelanceAgent(object):
             self.actives.append(server)
             # these are in the C case, but seem redundant:
             server.ping_at = time.time() + 1e-3*PING_INTERVAL
-            server.expires = time.time() + 1e-3*SERVER_TTL
+            server.expires = time.time() + 1e-3*self.global_timeout
         elif command == "REQUEST":
             assert not self.request    # Strict request-reply cycle
             # Prefix request with sequence number and empty envelope
@@ -188,8 +188,8 @@ class FreelanceAgent(object):
 # Asynchronous agent manages server pool and handles request/reply
 # dialog when the application asks for it.
 
-def agent_task(ctx, pipe, threadevent):
-    agent = FreelanceAgent(ctx, pipe)
+def agent_task(ctx, pipe, threadevent, global_timeout):
+    agent = FreelanceAgent(ctx, pipe, global_timeout)
     logging.info('registering client agent...')
     poller = zmq.Poller()
     poller.register(agent.pipe, zmq.POLLIN)
