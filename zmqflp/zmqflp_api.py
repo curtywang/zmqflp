@@ -190,7 +190,7 @@ class FreelanceAgent(object):
 async def agent_task(ctx, pipe, threadevent, global_timeout):
     agent = FreelanceAgent(ctx, pipe, global_timeout)
     logging.info('registering client agent...')
-    poller = zmq.Poller()
+    poller = zmq.asyncio.Poller()
     poller.register(agent.pipe, zmq.POLLIN)
     poller.register(agent.router, zmq.POLLIN)
     logging.info('done registering client agent!')
