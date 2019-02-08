@@ -1,7 +1,7 @@
 import time
 import msgpack
 import logging
-import zmqflp_api
+from .zmqflp_api import FreelanceClient
 
 # Client usable with Context Managers
 # needed for containerized python jobs

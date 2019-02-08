@@ -1,7 +1,7 @@
 import time
 import msgpack
 import logging
-import zmqflp_api
+from .zmqflp_api import FreelanceClient
 
 class ZMQFLPClient(object):
     def __init__(self, list_of_server_ips_with_ports_as_str, total_timeout=4000):
