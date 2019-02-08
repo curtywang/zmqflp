@@ -46,7 +46,7 @@ class FreelanceClient(object):
         #self.agent = threading.Thread(target=agent_task, args=(self.ctx, self.peer, self.threadevent, self.global_timeout))
         #self.agent.daemon = True
         #self.agent.start()
-        self.agent = await asyncio.run(agent_task(self.ctx, self.peer, self.threadevent, self.global_timeout))
+        self.agent = asyncio.create_task(agent_task(self.ctx, self.peer, self.threadevent, self.global_timeout))
 
     def zpipe(self, ctx):
         """build inproc pipe for talking to threads
