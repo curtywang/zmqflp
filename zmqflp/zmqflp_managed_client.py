@@ -18,12 +18,12 @@ class ZMQFLPManagedClient(object):
         return self
 
     def send_and_receive(self, in_request):
-        reply = self.client.request(cbor2.dumps(in_request, use_bin_type=True))
+        reply = self.client.request(cbor2.dumps(in_request)) #, use_bin_type=True))
         if not reply:
             logging.info("error, request "+str(in_request)+" unserviced")
             return False
         else:
-            return cbor2.loads(reply[2], raw=False, encoding="utf-8")
+            return cbor2.loads(reply[2]) #, raw=False, encoding="utf-8")
     
     def __exit__(self, *args):
         try:

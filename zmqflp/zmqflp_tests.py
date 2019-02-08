@@ -36,13 +36,13 @@ async def server_loop():
 def run_test(client, num_of_tests):
     for i in range(num_of_tests):
         test_message = ["TEST" for i in range(LEN_TEST_MESSAGE)]
-        reply = client.send_and_receive(cbor2.dumps(test_message, use_bin_type=True))
+        reply = client.send_and_receive(cbor2.dumps(test_message)) #, use_bin_type=True))
         #logging.debug('reply: '+str(reply))
         if (len(reply) != LEN_TEST_MESSAGE) and (reply[-1] != "TEST"):#"TEST_OK":
             logging.debug("TEST_FAILURE")
             raise ValueError()
     logging.debug("ending client send")
-    client.send_and_receive(cbor2.dumps("EXIT", use_bin_type=True))
+    client.send_and_receive(cbor2.dumps("EXIT")) #, use_bin_type=True))
     return
 
 
