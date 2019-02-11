@@ -55,6 +55,7 @@ class FreelanceClient(object):
         b = ctx.socket(zmq.PAIR)
         a.linger = b.linger = 0
         a.hwm = b.hwm = 1
+        a.RCVTIMEO = self.global_timeout
         #iface = "inproc://%s" % binascii.hexlify(os.urandom(8))
         iface = 'tcp://127.0.0.1'
         port = a.bind_to_random_port(iface, min_port=10000, max_port=65536, max_tries=10)
