@@ -55,7 +55,7 @@ class FreelanceClient(object):
         b = ctx.socket(zmq.PAIR)
         a.linger = b.linger = 0
         a.hwm = b.hwm = 1
-        a.RCVTIMEO = self.global_timeout
+        #a.RCVTIMEO = self.global_timeout
         #iface = "inproc://%s" % binascii.hexlify(os.urandom(8))
         iface = 'tcp://127.0.0.1'
         port = a.bind_to_random_port(iface, min_port=10000, max_port=65536, max_tries=10)
@@ -223,7 +223,7 @@ def agent_task(ctx, pipe, threadevent, global_timeout):
                 agent.request = None
             else:
                 # Find server to talk to, remove any expired ones
-                while agent.actives:
+                if len(agent.actives) > 0:
                     server = agent.actives.pop(0)
                     if time.time() >= server.expires:
                         server.alive = 0
@@ -232,7 +232,6 @@ def agent_task(ctx, pipe, threadevent, global_timeout):
                         agent.router.send_multipart(request)
                         if server not in agent.actives:
                             agent.actives.append(server) # maintian LRU queue
-                        break
 
         # Disconnect and delete any expired servers
         # Send heartbeats to idle servers if needed
