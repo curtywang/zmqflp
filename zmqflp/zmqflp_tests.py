@@ -1,4 +1,4 @@
-import zmqflp_client
+import zmqflp_managed_client
 import zmqflp_server
 import time
 from multiprocessing import Process
@@ -7,16 +7,21 @@ import asyncio
 import logging
 import cbor2
 
-
-LEN_TEST_MESSAGE = 10000
+LEN_TEST_MESSAGE = 100
+log_handlers = [logging.StreamHandler()]
+logging.basicConfig(
+    format='%(asctime)s %(levelname)-8s %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    handlers=log_handlers,
+    level=logging.DEBUG)
 
 
 def server_main():
     asyncio.run(server_loop())
     return 0
 
+
 async def server_loop():
-    logger = logging.getLogger()
     server = zmqflp_server.ZMQFLPServer(str_port='9001')
     keep_running = True
     while keep_running:
@@ -26,49 +31,45 @@ async def server_loop():
         if req_object != "EXIT":
             await server.send(orig_headers, req_object)
         elif req_object == "EXIT":
-            logger.info('server exiting...')
+            logging.info('server exiting...')
             await server.send(orig_headers, "EXITING")
             keep_running = False
     if keep_running is False:
         return
 
 
-def run_test(client, num_of_tests):
-    for i in range(num_of_tests):
-        test_message = ["TEST" for i in range(LEN_TEST_MESSAGE)]
-        reply = client.send_and_receive(cbor2.dumps(test_message)) #, use_bin_type=True))
-        #logging.debug('reply: '+str(reply))
-        if (len(reply) != LEN_TEST_MESSAGE) and (reply[-1] != "TEST"):#"TEST_OK":
-            logging.debug("TEST_FAILURE")
-            raise ValueError()
+def run_test(num_of_tests):
+    with zmqflp_managed_client.ZMQFLPManagedClient([socket.gethostbyname(socket.gethostname()) + ':9001']) as client:
+        for i in range(num_of_tests):
+            test_message = ["TEST" for i in range(LEN_TEST_MESSAGE)]
+            # logging.info('hi!')
+            reply = client.send_and_receive(cbor2.dumps(test_message))  # , use_bin_type=True))
+            # logging.info(reply)
+            # logging.debug('reply: '+str(reply))
+            if (len(reply) != LEN_TEST_MESSAGE) and (reply[-1] != "TEST"):  # "TEST_OK":
+                logging.debug("TEST_FAILURE")
+                raise ValueError()
     logging.debug("ending client send")
-    client.send_and_receive(cbor2.dumps("EXIT")) #, use_bin_type=True))
     return
 
 
 def main():
-    log_handlers = [logging.StreamHandler()]
-    logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s', 
-        datefmt='%Y-%m-%d %H:%M:%S', 
-        handlers=log_handlers, 
-        level=logging.DEBUG)
-    requests = 1000
+    requests = 2000
     server_process = Process(target=server_main, daemon=True)
     server_process.start()
     time.sleep(0.5)
-    #client_process = Process(target=client_main, args=(requests,))
-    client = zmqflp_client.ZMQFLPClient([socket.gethostbyname(socket.gethostname())+':9001'])
+    # client_process = Process(target=client_main, args=(requests,))
+    # client = zmqflp_client.ZMQFLPClient([socket.gethostbyname(socket.gethostname()) + ':9001'])
 
     logging.debug(">> starting zmq freelance protocol test!")
     start = time.time()
-    run_test(client, requests)
-    #client_process.start()
-    #client_process.join()
+    run_test(requests)
+    # client_process.start()
+    # client_process.join()
     avg_time = ((time.time() - start) / requests)
     logging.debug(">> waiting for server to exit...")
     server_process.join(timeout=1)
-    logging.debug("Average RT time (sec): "+str(avg_time))
+    logging.debug("Average RT time (sec): " + str(avg_time))
     return
 
 

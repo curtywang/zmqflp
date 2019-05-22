@@ -1,5 +1,4 @@
 import asyncio
-import sys
 import zmq
 import zmq.asyncio
 import socket
@@ -43,18 +42,27 @@ class ZMQFLPServer(object):
         else:
             if request[0] not in self.message_table:
                 self.message_table[request[0]] = request[1]
-                return (cbor2.loads(request[2]), request[0:2]) # , raw=False, encoding="utf-8"
+                return (await asyncio.get_running_loop().run_in_executor(None,
+                                                                         cbor2.loads,
+                                                                         request[2]),
+                        request[0:2])  # , raw=False, encoding="utf-8"
             elif self.message_table[request[0]] == request[1]:
                 return (None, None)
             else:
                 self.message_table[request[0]] = request[1]
-                return (cbor2.loads(request[2]), request[0:2]) # , raw=False, encoding="utf-8"
+                return (await asyncio.get_running_loop().run_in_executor(None,
+                                                                         cbor2.loads,
+                                                                         request[2]),
+                        request[0:2]) # , raw=False, encoding="utf-8"
 
 
     async def send(self, orig_req_headers, str_resp, mpack=True):
         out_message = orig_req_headers
         if mpack:
-            out_message.append(cbor2.dumps(str_resp)) #, use_bin_type=True))#.encode('utf8'))
+            out_message.append(
+                await asyncio.get_running_loop().run_in_executor(None,
+                                                                 cbor2.dumps,
+                                                                 str_resp))  # , use_bin_type=True))#.encode('utf8'))
         else:
             out_message.append(str_resp)
         await self.server.send_multipart(out_message)
