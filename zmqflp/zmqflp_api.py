@@ -45,8 +45,8 @@ class FreelanceClient(object):
     def stop(self):
         logging.info('got the idea to stop, closing the socket')
         self.router.close()
-        logging.info('terminating context')
-        self.ctx.term()
+        # logging.info('terminating context')
+        # self.ctx.term()
 
     def send_and_receive(self, msg):
         assert not self.request
