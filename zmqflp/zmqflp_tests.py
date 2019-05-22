@@ -39,8 +39,8 @@ async def server_loop():
 
 
 def run_test(num_of_tests):
-    with zmqflp_managed_client.ZMQFLPManagedClient([socket.gethostbyname(socket.gethostname()) + ':9001']) as client:
-        for i in range(num_of_tests):
+    for i in range(num_of_tests):
+        with zmqflp_managed_client.ZMQFLPManagedClient([socket.gethostbyname(socket.gethostname()) + ':9001']) as client:
             test_message = ["TEST" for i in range(LEN_TEST_MESSAGE)]
             # logging.info('hi!')
             reply = client.send_and_receive(cbor2.dumps(test_message))  # , use_bin_type=True))
@@ -54,7 +54,7 @@ def run_test(num_of_tests):
 
 
 def main():
-    requests = 2000
+    requests = 30
     server_process = Process(target=server_main, daemon=True)
     server_process.start()
     time.sleep(0.5)

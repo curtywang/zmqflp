@@ -1,7 +1,7 @@
 import cbor2
 import logging
-from .zmqflp_api import FreelanceClient
-# from zmqflp_api import FreelanceClient
+# from .zmqflp_api import FreelanceClient
+from zmqflp_api import FreelanceClient
 
 # Client usable with Context Managers
 # needed for containerized python jobs

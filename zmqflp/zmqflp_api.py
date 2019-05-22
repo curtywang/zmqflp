@@ -40,6 +40,7 @@ class FreelanceClient(object):
         logging.debug("I: connecting to %s..." % endpoint)
         self.router.connect(endpoint)
         self.actives.append(endpoint)
+        time.sleep(0.1)
 
     def stop(self):
         logging.info('got the idea to stop, closing the socket')
