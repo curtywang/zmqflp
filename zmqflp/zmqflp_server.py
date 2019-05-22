@@ -5,6 +5,7 @@ import socket
 import cbor2
 import logging
 
+
 class ZMQFLPServer(object):
     def __init__(self, custom_identity = None, str_port = '9001'):
         ctx = zmq.asyncio.Context()

@@ -26,8 +26,6 @@ class ZMQFLPManagedClient(object):
             return cbor2.loads(reply)  # , raw=False, encoding="utf-8")
     
     def __exit__(self, *args):
-        try:
-            logging.debug('stopping client...')
-            self.client.stop()
-        except Exception as e:
-            return
+        logging.debug('stopping client...')
+        self.client.stop()
+        return False

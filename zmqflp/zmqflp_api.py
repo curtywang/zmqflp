@@ -34,16 +34,18 @@ class FreelanceClient(object):
         self.ctx = zmq.Context()
         self.global_timeout = optional_global_timeout
         self.router = self.ctx.socket(zmq.ROUTER)
+        self.router.setsockopt(zmq.ROUTER_MANDATORY, 1)
         self.actives = []
 
     def connect(self, endpoint):
-        logging.debug("I: connecting to %s..." % endpoint)
+        logging.debug("I: connecting to " + endpoint)
         self.router.connect(endpoint)
         self.actives.append(endpoint)
-        time.sleep(0.1)
+        time.sleep(0.3)
 
     def stop(self):
-        logging.info('got the idea to stop, closing the socket')
+        logging.debug('got the idea to stop, closing the socket')
+        self.router.disconnect()
         self.router.close()
         # logging.info('terminating context')
         # self.ctx.term()
