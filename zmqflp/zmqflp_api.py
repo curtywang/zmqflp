@@ -45,7 +45,8 @@ class FreelanceClient(object):
 
     def stop(self):
         logging.debug('got the idea to stop, closing the socket')
-        self.router.disconnect()
+        for server in self.actives:
+            self.router.disconnect(server)
         self.router.close()
         # logging.info('terminating context')
         # self.ctx.term()
