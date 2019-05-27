@@ -8,7 +8,7 @@ import logging
 
 class ZMQFLPServer(object):
     def __init__(self, custom_identity = None, str_port = '9001'):
-        ctx = zmq.asyncio.Context()
+        ctx = zmq.asyncio.Context.instance()
         # Prepare server socket with predictable identity
         if custom_identity:
             identity = custom_identity
