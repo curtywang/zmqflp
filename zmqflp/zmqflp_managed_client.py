@@ -18,6 +18,9 @@ class ZMQFLPManagedClient(object):
     def __enter__(self):
         return self
 
+    def __str__(self):
+        return str(self.client.servers)
+
     def send_and_receive(self, in_request):
         reply = self.client.send_and_receive(cbor2.dumps(in_request))  # , use_bin_type=True))
         if not reply:
