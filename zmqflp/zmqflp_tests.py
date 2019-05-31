@@ -46,11 +46,11 @@ def client_loop(num_of_tests):
     randtag = uuid.uuid4()
     time.sleep(random.randint(1, 6))
     for i in range(num_of_tests):
-        test_message = ["TEST"+str(i)+str(randtag) for i in range(LEN_TEST_MESSAGE)]
+        test_message = str(["TEST"+str(i)+str(randtag) for i in range(LEN_TEST_MESSAGE)])
         reply = client.send_and_receive(cbor2.dumps(test_message))  # , use_bin_type=True))
         # logging.info(reply)
         # logging.debug('reply: '+str(reply))
-        if (len(reply) != LEN_TEST_MESSAGE) and (reply[-1] != "TEST"):  # "TEST_OK":
+        if (len(reply) != LEN_TEST_MESSAGE) and (reply[-1] != test_message):  # "TEST_OK":
             logging.debug("TEST_FAILURE")
             raise ValueError()
 
