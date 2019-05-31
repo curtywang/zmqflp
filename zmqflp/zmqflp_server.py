@@ -7,8 +7,8 @@ import logging
 
 
 class ZMQFLPServer(object):
-    def __init__(self, custom_identity = None, str_port = '9001'):
-        ctx = zmq.asyncio.Context.instance()
+    def __init__(self, custom_identity=None, str_port='9001'):
+        self.ctx = zmq.asyncio.Context.instance()
         # Prepare server socket with predictable identity
         if custom_identity:
             identity = custom_identity
@@ -16,14 +16,14 @@ class ZMQFLPServer(object):
             identity = socket.gethostbyname(socket.gethostname())
         bind_endpoint = "tcp://*:"+str(str_port)
         connect_endpoint = ('tcp://'+identity+':'+str(str_port)).encode('utf8')
-        self.server = ctx.socket(zmq.ROUTER)
+        self.server = self.ctx.socket(zmq.ROUTER)
+        self.server.setsockopt(zmq.ROUTER_MANDATORY, 1)
         self.server.setsockopt(zmq.IDENTITY, connect_endpoint)
         self.server.bind(bind_endpoint)
         logging.info("I: service is ready with identity " + str(connect_endpoint))
         logging.info("I: service is bound to " + str(bind_endpoint))
 
         self.message_table = {}
-
 
     async def receive(self):
         # Frame 0: identity of client
@@ -54,8 +54,7 @@ class ZMQFLPServer(object):
                 return (await asyncio.get_running_loop().run_in_executor(None,
                                                                          cbor2.loads,
                                                                          request[2]),
-                        request[0:2]) # , raw=False, encoding="utf-8"
-
+                        request[0:2])  # , raw=False, encoding="utf-8"
 
     async def send(self, orig_req_headers, str_resp, mpack=True):
         out_message = orig_req_headers
