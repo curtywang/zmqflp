@@ -31,30 +31,18 @@ class ZMQFLPServer(object):
         # Frame 2: request body
         try:
             request = await self.server.recv_multipart()
-            control = request[1].decode('utf8')
+            seq_number = request[1].decode('utf8')
         except asyncio.CancelledError:
             return (None, None) # Interrupted
         except Exception as e:
             logging.exception(e)
             return (None, None) # Interrupted
-        if control == "PING":
-            await self.send([request[0]], "PONG".encode('utf8'), mpack=False)
-            return (request[1].decode('utf8'), [request[0]])
         else:
-            if request[0] not in self.message_table:
-                self.message_table[request[0]] = request[1]
-                return (await asyncio.get_running_loop().run_in_executor(None,
-                                                                         cbor2.loads,
-                                                                         request[2]),
-                        request[0:2])  # , raw=False, encoding="utf-8"
-            elif self.message_table[request[0]] == request[1]:
-                return (None, None)
-            else:
-                self.message_table[request[0]] = request[1]
-                return (await asyncio.get_running_loop().run_in_executor(None,
-                                                                         cbor2.loads,
-                                                                         request[2]),
-                        request[0:2])  # , raw=False, encoding="utf-8"
+            self.message_table[request[0]] = request[1]
+            return (await asyncio.get_running_loop().run_in_executor(None,
+                                                                     cbor2.loads,
+                                                                     request[-1]),
+                    request[0:-1])  # , raw=False, encoding="utf-8"
 
     async def send(self, orig_req_headers, str_resp, mpack=True):
         out_message = orig_req_headers

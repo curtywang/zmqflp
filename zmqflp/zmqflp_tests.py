@@ -1,7 +1,7 @@
 import zmqflp_client
 import zmqflp_server
 import time
-from multiprocessing import Process
+from multiprocessing import Process, set_start_method
 import socket
 import asyncio
 import logging
@@ -50,7 +50,7 @@ def client_loop(num_of_tests):
         reply = client.send_and_receive(cbor2.dumps(test_message))  # , use_bin_type=True))
         # logging.info(reply)
         # logging.debug('reply: '+str(reply))
-        if (len(reply) != LEN_TEST_MESSAGE) and (reply[-1] != test_message):  # "TEST_OK":
+        if (len(reply) != len(test_message)) and (reply[-1] != test_message):  # "TEST_OK":
             logging.debug("TEST_FAILURE")
             raise ValueError()
 
@@ -67,6 +67,7 @@ def run_test(num_of_tests):
 
 
 def main():
+    set_start_method('spawn')
     requests = 30
     logging.debug(">> starting zmq server!")
     server_process = Process(target=server_main, daemon=True)

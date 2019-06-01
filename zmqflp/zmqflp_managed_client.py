@@ -1,7 +1,7 @@
 import cbor2
 import logging
-# from .zmqflp_client import FreelanceClient  # PROD
-from zmqflp_client import FreelanceClient  # DEBUG
+from .zmqflp_client import FreelanceClient  # PROD
+# from zmqflp_client import FreelanceClient  # DEBUG
 
 # Client usable with Context Managers
 # needed for containerized python jobs
@@ -23,10 +23,10 @@ class ZMQFLPManagedClient(object):
 
     def send_and_receive(self, in_request):
         reply = self.client.send_and_receive(cbor2.dumps(in_request))  # , use_bin_type=True))
-        if not reply:
-            raise ValueError('request unserviced!')
-        else:
+        if reply:
             return cbor2.loads(reply)  # , raw=False, encoding="utf-8")
+        else:
+            raise ValueError('request unserviced!')
     
     def __exit__(self, *args):
         logging.debug('stopping client...')
