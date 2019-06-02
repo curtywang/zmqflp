@@ -41,9 +41,9 @@ class FreelanceClient(object):
             self.request = [self.server.encode('utf8')] + [msg]
             self.router.send_multipart(self.request)
             events = dict(self.poller.poll(timeout=self.global_timeout))
+            self.request = None
             if self.router in events:
                 reply = self.router.recv_multipart()
-                self.request = None
                 return cbor2.loads(reply[-1])
             else:
                 return None
