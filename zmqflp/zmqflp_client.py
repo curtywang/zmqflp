@@ -5,13 +5,6 @@ import zmq
 
 import uuid
 
-# If no server replies within this time, abandon request
-GLOBAL_TIMEOUT = 4000    # msecs
-# PING interval for servers we think are alivecp
-PING_INTERVAL = 1000    # msecs
-# Server considered dead if silent for this long
-SERVER_TTL = 12000    # msecs
-
 
 class FreelanceClient(object):
     ctx = None      # Our Context
@@ -21,9 +14,9 @@ class FreelanceClient(object):
     reply = None  # Current reply if any
     expires = 0  # Timeout for request/reply
 
-    def __init__(self, optional_global_timeout=4000):
+    def __init__(self, global_timeout):
         self.ctx = zmq.Context.instance()
-        self.global_timeout = optional_global_timeout
+        self.global_timeout = global_timeout
         self.router = self.ctx.socket(zmq.DEALER)
         self.router.setsockopt_unicode(zmq.IDENTITY, str(uuid.uuid4()))
         # self.router.setsockopt(zmq.ROUTER_MANDATORY, 1)
@@ -51,17 +44,19 @@ class FreelanceClient(object):
             if self.router in events:
                 reply = self.router.recv_multipart()
                 self.request = None
-                return reply[-1]
+                return cbor2.loads(reply[-1])
+            else:
+                return None
         except Exception as e:
             logging.exception(e)
             raise e
 
 
 class ZMQFLPClient(object):
-    def __init__(self, list_of_server_ips_with_ports_as_str, total_timeout=4000):
+    def __init__(self, list_of_server_ips_with_ports_as_str, total_timeout=7000):
         self.clients = []
         for ip in list_of_server_ips_with_ports_as_str:
-            this_client = FreelanceClient(optional_global_timeout=total_timeout)
+            this_client = FreelanceClient(global_timeout=total_timeout)
             logging.info('client: connecting to server '+ip)
             this_client.connect("tcp://"+ip)
             logging.info('client: added server '+ip)
@@ -71,10 +66,9 @@ class ZMQFLPClient(object):
         return str([str(x.server) for x in self.clients])
 
     def send_and_receive(self, in_request):
-        the_client = self.clients.pop(0)
-        reply = the_client.send_and_receive(cbor2.dumps(in_request))  # , use_bin_type=True))
-        self.clients.append(the_client)
-        if reply:
-            return cbor2.loads(reply)  # , raw=False, encoding="utf-8")
-        else:
-            raise ValueError("error, request " + str(in_request) + " unserviced")
+        incoming_request = cbor2.dumps(in_request)
+        for the_client in self.clients:
+            reply = the_client.send_and_receive(incoming_request)
+            if reply is not None:
+                return reply
+        raise ValueError("error, request " + str(in_request) + " unserviced")
